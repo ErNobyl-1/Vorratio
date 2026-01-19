@@ -1,9 +1,6 @@
 services:
   vorratio-app:
-    build:
-      context: .
-      args:
-        VITE_DEFAULT_LOCALE: ${VITE_DEFAULT_LOCALE:-en}
+    image: ghcr.io/ernobyl-1/vorratio:latest
     container_name: vorratio
     restart: unless-stopped
     ports:

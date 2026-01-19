@@ -27,57 +27,81 @@ A private, offline-capable PWA for managing your household inventory. No cloud, 
 | PWA | vite-plugin-pwa, Workbox |
 | Auth | Session-based with app password |
 | i18n | Custom YAML-based |
-| Deployment | Docker |
+| Deployment | Docker (GHCR) |
 
 ## Quick Start
 
 ### Using Docker (Recommended)
 
-1. Clone the repository:
+The Docker image is automatically built and published to GitHub Container Registry on every push to `main`.
+
+1. Create a directory for your deployment:
    ```bash
-   git clone https://github.com/your-username/Vorratio.git
-   cd Vorratio
+   mkdir vorratio && cd vorratio
    ```
 
-2. Copy and configure environment:
+2. Download the docker-compose file:
    ```bash
-   cp .env.example .env
-   # Edit .env to set your password and session secret
+   curl -O https://raw.githubusercontent.com/ErNobyl-1/Vorratio/main/docker-compose.yml
    ```
 
-3. Start with Docker Compose:
+3. Create a `.env` file with your configuration:
    ```bash
-   docker-compose up -d
+   cat > .env << EOF
+   APP_PORT=8124
+   AUTH_PASSWORD=your-secure-password
+   SESSION_SECRET=$(openssl rand -hex 32)
+   DEFAULT_LOCALE=en
+   EOF
    ```
 
-4. Open http://localhost:8124 in your browser
+4. Start the container:
+   ```bash
+   docker compose up -d
+   ```
+
+5. Open http://localhost:8124 in your browser
+
+### Updating
+
+To update to the latest version:
+```bash
+docker compose pull
+docker compose up -d
+```
 
 ### Development Setup
 
-1. Install dependencies:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ErNobyl-1/Vorratio.git
+   cd Vorratio
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Set up environment:
+3. Set up environment:
    ```bash
    cp .env.example .env
    # Set DATABASE_URL=file:./dev.db for local development
    ```
 
-3. Initialize database:
+4. Initialize database:
    ```bash
    npm run db:push
    ```
 
-4. Start development servers:
+5. Start development servers:
    ```bash
    npm run dev
    ```
 
    This starts both the API (port 3000) and web frontend (port 5173).
 
-5. Open http://localhost:5173 in your browser
+6. Open http://localhost:5173 in your browser
 
 ## Environment Variables
 
@@ -86,7 +110,7 @@ A private, offline-capable PWA for managing your household inventory. No cloud, 
 | `APP_PORT` | Port for the application | `8124` |
 | `AUTH_PASSWORD` | Initial app password | `changeme` |
 | `SESSION_SECRET` | Secret for session encryption | (required) |
-| `VITE_DEFAULT_LOCALE` | Default language (`en` or `de`) | `en` |
+| `DEFAULT_LOCALE` | Default language (`en` or `de`) | `en` |
 | `TZ` | Timezone | `Europe/Berlin` |
 | `DATABASE_URL` | SQLite database path | (set by Docker) |
 
@@ -112,10 +136,24 @@ Vorratio/
 │       │   └── lib/           # API client, hooks
 │       └── public/            # Static assets
 │
+├── .github/
+│   └── workflows/
+│       └── build-and-push.yml  # CI/CD pipeline
 ├── docker-compose.yml
 ├── Dockerfile
 └── PLAN.md           # Development roadmap
 ```
+
+## CI/CD
+
+The project uses GitHub Actions for continuous integration and deployment:
+
+- **Trigger**: Every push to the `main` branch
+- **Build**: Multi-stage Docker build
+- **Registry**: GitHub Container Registry (ghcr.io)
+- **Tags**: `latest` and commit SHA
+
+The workflow automatically builds and pushes the Docker image, so you always get the latest version with `docker compose pull`.
 
 ## API Endpoints
 
