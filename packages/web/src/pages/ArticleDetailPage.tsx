@@ -178,14 +178,14 @@ export default function ArticleDetailPage() {
               className="btn btn-secondary flex items-center gap-2"
             >
               <Minus size={20} />
-              {t('article.consume')}
+              <span className="hidden sm:inline">{t('article.consume')}</span>
             </button>
             <button
               onClick={() => setAddBatchModal(true)}
               className="btn btn-primary flex items-center gap-2"
             >
               <Plus size={20} />
-              {t('article.addBatch')}
+              <span className="hidden sm:inline">{t('article.addBatch')}</span>
             </button>
           </div>
         </div>

@@ -169,7 +169,6 @@ export interface Article {
   batches?: Batch[];
   allBatches?: Batch[]; // All batches including depleted ones for history
   products?: Product[];
-  matchedProduct?: Product; // When found via barcode lookup
   lastPurchasePrice?: number | null;
   avgPrice?: number | null;
 }
@@ -204,9 +203,6 @@ export const articles = {
 
   get: (id: string) =>
     request<Article & { consumptionLogs: ConsumptionLog[]; recipeIngredients: any[] }>(`/articles/${id}`),
-
-  getByBarcode: (barcode: string) =>
-    request<Article>(`/articles/barcode/${barcode}`),
 
   getExpiring: (days: number = 7) =>
     request<Batch[]>(`/articles/expiring?days=${days}`),
@@ -674,9 +670,6 @@ export const products = {
 
   get: (id: string) =>
     request<Product>(`/products/${id}`),
-
-  getByBarcode: (barcode: string) =>
-    request<Product>(`/products/barcode/${barcode}`),
 
   create: (data: CreateProductInput) =>
     request<Product>('/products', {

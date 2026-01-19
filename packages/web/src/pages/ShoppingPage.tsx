@@ -646,14 +646,17 @@ function ShoppingItemRow({
               >
                 {/* Show recommended packs if available, otherwise show raw quantity */}
                 {item.recommendedPacks && item.recommendedPacks > 0 && item.article?.packageSize ? (
-                  <span>
-                    {item.recommendedPacks}× {item.article.packageSize} {item.article.packageUnit || item.unit}
-                    <span className="text-gray-400 ml-1">({item.quantity} {item.unit})</span>
+                  <span className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                    <span className="flex items-center gap-1">
+                      {item.recommendedPacks}× {item.article.packageSize} {item.article.packageUnit || item.unit}
+                      {!item.purchased && <Edit size={10} className="sm:hidden" />}
+                    </span>
+                    <span className="text-gray-400">({item.quantity} {item.unit})</span>
                   </span>
                 ) : (
                   <span>{item.quantity} {item.unit}</span>
                 )}
-                {!item.purchased && <Edit size={10} />}
+                {!item.purchased && <Edit size={10} className="hidden sm:inline" />}
               </button>
             )}
             <span className="flex items-center gap-1">

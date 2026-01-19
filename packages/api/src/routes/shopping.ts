@@ -59,9 +59,10 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       return reply.status(404).send({ error: 'No active shopping list' });
     }
 
+    type ShoppingItem = typeof list.items[number];
     const totalItems = list.items.length;
-    const purchasedItems = list.items.filter((i) => i.isPurchased).length;
-    const estimatedTotal = list.items.reduce((sum, i) => sum + (i.estimatedPrice || 0), 0);
+    const purchasedItems = list.items.filter((i: ShoppingItem) => i.isPurchased).length;
+    const estimatedTotal = list.items.reduce((sum: number, i: ShoppingItem) => sum + (i.estimatedPrice || 0), 0);
 
     // Map to frontend expected format
     return {
@@ -71,7 +72,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       planUntil: list.planUntilDate,
       completedAt: list.completedAt,
       createdAt: list.createdAt,
-      items: list.items.map((item) => ({
+      items: list.items.map((item: ShoppingItem) => ({
         id: item.id,
         shoppingListId: item.listId,
         articleId: item.articleId,
@@ -118,9 +119,10 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       return reply.status(404).send({ error: 'Shopping list not found' });
     }
 
+    type ShoppingItem = typeof list.items[number];
     const totalItems = list.items.length;
-    const purchasedItems = list.items.filter((i) => i.isPurchased).length;
-    const estimatedTotal = list.items.reduce((sum, i) => sum + (i.estimatedPrice || 0), 0);
+    const purchasedItems = list.items.filter((i: ShoppingItem) => i.isPurchased).length;
+    const estimatedTotal = list.items.reduce((sum: number, i: ShoppingItem) => sum + (i.estimatedPrice || 0), 0);
 
     // Map to frontend expected format
     return {
@@ -130,7 +132,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       planUntil: list.planUntilDate,
       completedAt: list.completedAt,
       createdAt: list.createdAt,
-      items: list.items.map((item) => ({
+      items: list.items.map((item: ShoppingItem) => ({
         id: item.id,
         shoppingListId: item.listId,
         articleId: item.articleId,
@@ -502,6 +504,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
     });
 
     // Map to frontend expected format
+    type GeneratedItem = typeof list.items[number];
     return reply.status(201).send({
       id: list.id,
       name: list.name,
@@ -509,7 +512,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       planUntil: list.planUntilDate,
       completedAt: list.completedAt,
       createdAt: list.createdAt,
-      items: list.items.map((item) => ({
+      items: list.items.map((item: GeneratedItem) => ({
         id: item.id,
         shoppingListId: item.listId,
         articleId: item.articleId,
@@ -714,7 +717,8 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
     }
 
     // Create batches for purchased items with articleId
-    const batchPromises = list.items.map((item) => {
+    type PurchasedItem = typeof list.items[number];
+    const batchPromises = list.items.map((item: PurchasedItem) => {
       if (!item.articleId) return null;
 
       return prisma.batch.create({

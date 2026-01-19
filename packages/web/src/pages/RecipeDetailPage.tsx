@@ -275,10 +275,12 @@ export default function RecipeDetailPage() {
             {!cookResult ? (
               <>
                 <h3 className="text-lg font-semibold mb-4">{t('recipe.cook')}</h3>
-                <p className="text-gray-600 mb-4">
-                  Cook <strong>{recipe.name}</strong> for <strong>{adjustedServings}</strong> servings?
-                  This will consume ingredients from your inventory.
-                </p>
+                <p
+                  className="text-gray-600 mb-4"
+                  dangerouslySetInnerHTML={{
+                    __html: t('recipe.cookConfirm', { name: recipe.name, servings: adjustedServings })
+                  }}
+                />
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowCookModal(false)}
@@ -308,17 +310,18 @@ export default function RecipeDetailPage() {
                 <div className={`flex items-center gap-3 mb-4 ${cookResult.success ? 'text-green-600' : 'text-red-600'}`}>
                   {cookResult.success ? <Check size={24} /> : <AlertCircle size={24} />}
                   <h3 className="text-lg font-semibold">
-                    {cookResult.success ? 'Cooked successfully!' : 'Cannot cook'}
+                    {cookResult.success ? t('recipe.cookSuccess') : t('recipe.cookFailed')}
                   </h3>
                 </div>
 
-                {cookResult.message && (
+                {/* Only show backend message on failure (not on success, since we have our own translation) */}
+                {!cookResult.success && cookResult.message && (
                   <p className="text-gray-600 mb-4">{cookResult.message}</p>
                 )}
 
                 {cookResult.consumed.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Consumed:</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">{t('recipe.consumed')}:</p>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {cookResult.consumed.map((item, i) => (
                         <li key={i}>
@@ -336,7 +339,7 @@ export default function RecipeDetailPage() {
 
                 {cookResult.missing && cookResult.missing.length > 0 && (
                   <div className="mb-4 p-3 bg-red-50 rounded-lg">
-                    <p className="text-sm font-medium text-red-700 mb-2">Missing ingredients:</p>
+                    <p className="text-sm font-medium text-red-700 mb-2">{t('recipe.missingIngredients')}:</p>
                     <ul className="text-sm text-red-600 space-y-1">
                       {cookResult.missing.map((item, i) => (
                         <li key={i}>
@@ -344,7 +347,7 @@ export default function RecipeDetailPage() {
                           {item.error ? (
                             <span> {item.error}</span>
                           ) : (
-                            <span> need {item.needed} {item.unit}, have {item.available ?? 0}</span>
+                            <span> {t('recipe.needHave', { needed: item.needed, unit: item.unit, available: item.available ?? 0 })}</span>
                           )}
                         </li>
                       ))}

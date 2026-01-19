@@ -176,51 +176,6 @@ export async function articleRoutes(fastify: FastifyInstance) {
     };
   });
 
-  // Get article by barcode (searches in products)
-  fastify.get('/articles/barcode/:barcode', async (request: FastifyRequest<{ Params: { barcode: string } }>, reply: FastifyReply) => {
-    const { barcode } = request.params;
-
-    // First, find the product with this barcode
-    const product = await prisma.product.findUnique({
-      where: { barcode },
-      include: {
-        article: {
-          include: {
-            location: true,
-            batches: {
-              where: { quantity: { gt: 0 } },
-              orderBy: [{ expiryDate: 'asc' }, { purchaseDate: 'asc' }],
-            },
-            recipeIngredients: {
-              include: {
-                recipe: {
-                  select: { id: true, name: true },
-                },
-              },
-            },
-            products: {
-              orderBy: { name: 'asc' },
-            },
-          },
-        },
-      },
-    });
-
-    if (!product) {
-      return reply.status(404).send({ error: 'Product not found' });
-    }
-
-    const article = product.article;
-    const totalStock = article.batches.reduce((sum: number, b: { quantity: number }) => sum + b.quantity, 0);
-
-    return {
-      ...article,
-      totalStock,
-      isLowStock: article.minStock ? totalStock < article.minStock : false,
-      matchedProduct: product, // Include which product matched the barcode
-    };
-  });
-
   // Create article
   fastify.post('/articles', async (request: FastifyRequest, reply: FastifyReply) => {
     const parseResult = CreateArticleSchema.safeParse(request.body);

@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../lib/db.js';
+import { prisma, Prisma } from '../lib/db.js';
 import { z } from 'zod';
 import { convertQuantityBetweenUnits } from './units.js';
 
@@ -180,7 +180,7 @@ export async function recipeRoutes(fastify: FastifyInstance) {
 
     try {
       // Update recipe and replace ingredients if provided
-      const recipe = await prisma.$transaction(async (tx) => {
+      const recipe = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // Update basic recipe data
         const updated = await tx.recipe.update({
           where: { id },

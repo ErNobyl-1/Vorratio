@@ -30,7 +30,6 @@ nav:
   recipes: Recipes
   mealPlan: Meal Plan
   shopping: Shopping
-  scan: Scan
   settings: Settings
   more: More
 
@@ -174,8 +173,15 @@ recipe:
   ingredients: Ingredients
   ingredientsEmpty: No ingredients added yet. Click the button above to add one.
   addIngredient: Add Ingredient
+  searchArticle: Search article...
   cook: Cook Now
   empty: No recipes yet
+  cookConfirm: "Cook <strong>{name}</strong> for <strong>{servings}</strong> servings? This will consume ingredients from your inventory."
+  cookSuccess: Cooked successfully!
+  cookFailed: Cannot cook
+  consumed: Consumed
+  missingIngredients: Missing ingredients
+  needHave: "need {needed} {unit}, have {available}"
 
 mealPlan:
   title: Meal Plan

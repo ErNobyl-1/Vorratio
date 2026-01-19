@@ -66,7 +66,7 @@ export async function mealPlanRoutes(fastify: FastifyInstance) {
     });
 
     // Calculate nutrition for each entry based on its servings
-    return entries.map((entry) => {
+    return entries.map((entry: typeof entries[number]) => {
       // Calculate total nutrition for the recipe
       let totalNutrition = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
 

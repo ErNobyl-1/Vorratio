@@ -30,7 +30,6 @@ nav:
   recipes: Rezepte
   mealPlan: Essensplan
   shopping: Einkauf
-  scan: Scannen
   settings: Einstellungen
   more: Mehr
 
@@ -174,8 +173,15 @@ recipe:
   ingredients: Zutaten
   ingredientsEmpty: Noch keine Zutaten. Klicke oben auf den Button um eine hinzuzufügen.
   addIngredient: Zutat hinzufügen
+  searchArticle: Artikel suchen...
   cook: Jetzt kochen
   empty: Noch keine Rezepte
+  cookConfirm: "<strong>{name}</strong> für <strong>{servings}</strong> Portionen kochen? Die Zutaten werden aus dem Inventar entnommen."
+  cookSuccess: Erfolgreich gekocht!
+  cookFailed: Kochen nicht möglich
+  consumed: Verbraucht
+  missingIngredients: Fehlende Zutaten
+  needHave: "benötigt {needed} {unit}, vorhanden {available}"
 
 mealPlan:
   title: Essensplan

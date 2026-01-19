@@ -151,29 +151,4 @@ export async function productRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Search products by barcode
-  fastify.get('/products/barcode/:barcode', async (request: FastifyRequest<{ Params: { barcode: string } }>, reply: FastifyReply) => {
-    const { barcode } = request.params;
-
-    const product = await prisma.product.findUnique({
-      where: { barcode },
-      include: {
-        article: {
-          include: {
-            location: true,
-            batches: {
-              where: { quantity: { gt: 0 } },
-              orderBy: [{ expiryDate: 'asc' }, { purchaseDate: 'asc' }],
-            },
-          },
-        },
-      },
-    });
-
-    if (!product) {
-      return reply.status(404).send({ error: 'Product not found' });
-    }
-
-    return product;
-  });
 }

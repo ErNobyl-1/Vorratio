@@ -1,5 +1,5 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, UtensilsCrossed, ShoppingCart, Settings, Scan, Calendar } from 'lucide-react';
+import { Outlet, NavLink, useLocation, Link } from 'react-router-dom';
+import { LayoutDashboard, Package, UtensilsCrossed, ShoppingCart, Settings, Calendar } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useTranslation } from '../i18n';
 
@@ -7,12 +7,13 @@ export default function Layout() {
   const location = useLocation();
   const { t } = useTranslation();
 
+  // Mobile: 5 items without settings (settings moves to header)
   const navItems = [
     { path: '/', icon: LayoutDashboard, label: t('nav.dashboard') },
     { path: '/inventory', icon: Package, label: t('nav.inventory') },
-    { path: '/scan', icon: Scan, label: t('nav.scan') },
+    { path: '/recipes', icon: UtensilsCrossed, label: t('nav.recipes') },
+    { path: '/meal-plan', icon: Calendar, label: t('nav.mealPlan') },
     { path: '/shopping', icon: ShoppingCart, label: t('nav.shopping') },
-    { path: '/settings', icon: Settings, label: t('nav.settings') },
   ];
 
   const desktopNavItems = [
@@ -26,6 +27,22 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Header - Mobile */}
+      <header className="md:hidden flex bg-white border-b border-gray-200 px-4 py-3 items-center justify-between">
+        <h1 className="text-lg font-bold text-primary-600">{t('app.name')}</h1>
+        <Link
+          to="/settings"
+          className={cn(
+            'p-2 rounded-lg transition-colors',
+            location.pathname === '/settings'
+              ? 'bg-primary-100 text-primary-700'
+              : 'text-gray-500 hover:bg-gray-100'
+          )}
+        >
+          <Settings size={22} />
+        </Link>
+      </header>
+
       {/* Header - Desktop */}
       <header className="hidden md:flex bg-white border-b border-gray-200 px-6 py-4 items-center justify-between relative z-10">
         <div className="flex items-center gap-8">

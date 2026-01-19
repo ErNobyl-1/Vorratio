@@ -432,12 +432,12 @@ export default function MealPlanPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('mealPlan.mealType')}
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {MEAL_TYPES.map((type) => (
                     <button
                       key={type}
                       onClick={() => setSelectedMealType(type)}
-                      className={`px-3 py-2 text-xs rounded-lg border ${
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
                         selectedMealType === type
                           ? 'bg-primary-100 border-primary-300 text-primary-700'
                           : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'

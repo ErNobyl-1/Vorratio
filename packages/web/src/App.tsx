@@ -11,7 +11,6 @@ import RecipeDetailPage from './pages/RecipeDetailPage';
 import RecipeEditPage from './pages/RecipeEditPage';
 import MealPlanPage from './pages/MealPlanPage';
 import ShoppingPage from './pages/ShoppingPage';
-import ScanPage from './pages/ScanPage';
 import SettingsPage from './pages/SettingsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -64,7 +63,6 @@ function AppRoutes() {
         <Route path="recipes/:id/edit" element={<RecipeEditPage />} />
         <Route path="meal-plan" element={<MealPlanPage />} />
         <Route path="shopping" element={<ShoppingPage />} />
-        <Route path="scan" element={<ScanPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

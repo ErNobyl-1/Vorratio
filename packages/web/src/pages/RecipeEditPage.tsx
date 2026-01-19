@@ -306,40 +306,15 @@ export default function RecipeEditPage() {
                   key={index}
                   className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg"
                 >
-                  <div className="text-gray-400 cursor-move mt-2">
+                  <div className="text-gray-400 cursor-move mt-2 hidden sm:block">
                     <GripVertical size={16} />
                   </div>
 
-                  <div className="flex-1 grid grid-cols-12 gap-2">
-                    {/* Quantity */}
-                    <div className="col-span-2">
-                      <input
-                        type="number"
-                        value={ing.quantity}
-                        onChange={(e) => updateIngredient(index, { quantity: parseFloat(e.target.value) || 0 })}
-                        className="input w-full text-sm"
-                        step="0.1"
-                        min="0"
-                      />
-                    </div>
-
-                    {/* Unit */}
-                    <div className="col-span-2">
-                      <select
-                        value={ing.unit}
-                        onChange={(e) => updateIngredient(index, { unit: e.target.value })}
-                        className="input w-full text-sm"
-                      >
-                        {unitList?.map((unit) => (
-                          <option key={unit.id} value={unit.symbol}>{unit.symbol}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Article / Category */}
-                    <div className="col-span-5 relative">
+                  <div className="flex-1 space-y-2">
+                    {/* Row 1: Article / Category (full width on mobile, part of grid on desktop) */}
+                    <div className="sm:hidden relative">
                       {ing.articleId ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 input bg-white">
                           <span className="flex-1 text-sm text-gray-700">
                             {allArticles?.find(a => a.id === ing.articleId)?.name || 'Article'}
                           </span>
@@ -367,7 +342,7 @@ export default function RecipeEditPage() {
                                 setArticleSearch(ing.categoryMatch || '');
                               }}
                               className="input w-full text-sm pl-7"
-                              placeholder="Search article or type category..."
+                              placeholder={t('recipe.searchArticle')}
                             />
                           </div>
 
@@ -396,22 +371,108 @@ export default function RecipeEditPage() {
                       )}
                     </div>
 
-                    {/* Optional */}
-                    <div className="col-span-2 flex items-center gap-1">
-                      <input
-                        type="checkbox"
-                        id={`optional-${index}`}
-                        checked={ing.optional}
-                        onChange={(e) => updateIngredient(index, { optional: e.target.checked })}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                      <label htmlFor={`optional-${index}`} className="text-xs text-gray-500">
-                        Optional
-                      </label>
-                    </div>
+                    {/* Row 2 (mobile) / Single row (desktop): Quantity, Unit, Optional, Delete */}
+                    <div className="flex items-center gap-2">
+                      {/* Quantity */}
+                      <div className="w-16 sm:w-20">
+                        <input
+                          type="number"
+                          value={ing.quantity}
+                          onChange={(e) => updateIngredient(index, { quantity: parseFloat(e.target.value) || 0 })}
+                          className="input w-full text-sm"
+                          step="0.1"
+                          min="0"
+                        />
+                      </div>
 
-                    {/* Delete */}
-                    <div className="col-span-1 flex justify-end">
+                      {/* Unit */}
+                      <div className="w-16 sm:w-20">
+                        <select
+                          value={ing.unit}
+                          onChange={(e) => updateIngredient(index, { unit: e.target.value })}
+                          className="input w-full text-sm"
+                        >
+                          {unitList?.map((unit) => (
+                            <option key={unit.id} value={unit.symbol}>{unit.symbol}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Article / Category - Desktop only (hidden on mobile) */}
+                      <div className="hidden sm:block flex-1 relative">
+                        {ing.articleId ? (
+                          <div className="flex items-center gap-2">
+                            <span className="flex-1 text-sm text-gray-700">
+                              {allArticles?.find(a => a.id === ing.articleId)?.name || 'Article'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateIngredient(index, { articleId: null, categoryMatch: '' })}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="relative">
+                              <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                              <input
+                                type="text"
+                                value={showArticleDropdown === index ? articleSearch : ing.categoryMatch || ''}
+                                onChange={(e) => {
+                                  setArticleSearch(e.target.value);
+                                  updateIngredient(index, { categoryMatch: e.target.value });
+                                }}
+                                onFocus={() => {
+                                  setShowArticleDropdown(index);
+                                  setArticleSearch(ing.categoryMatch || '');
+                                }}
+                                className="input w-full text-sm pl-7"
+                                placeholder={t('recipe.searchArticle')}
+                              />
+                            </div>
+
+                            {showArticleDropdown === index && filteredArticles.length > 0 && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setShowArticleDropdown(null)}
+                                />
+                                <div className="absolute left-0 right-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+                                  {filteredArticles.map((article) => (
+                                    <button
+                                      key={article.id}
+                                      type="button"
+                                      onClick={() => selectArticle(index, article)}
+                                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                                    >
+                                      <span>{article.name}</span>
+                                      <span className="text-xs text-gray-400">({article.defaultUnit})</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      {/* Optional */}
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="checkbox"
+                          id={`optional-${index}`}
+                          checked={ing.optional}
+                          onChange={(e) => updateIngredient(index, { optional: e.target.checked })}
+                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <label htmlFor={`optional-${index}`} className="text-xs text-gray-500 hidden sm:inline">
+                          Optional
+                        </label>
+                      </div>
+
+                      {/* Delete */}
                       <button
                         type="button"
                         onClick={() => removeIngredient(index)}

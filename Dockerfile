@@ -59,9 +59,6 @@ WORKDIR /app
 COPY --from=builder /app/packages/api/dist ./packages/api/dist
 COPY --from=builder /app/packages/web/dist ./packages/web/dist
 
-# Copy migration scripts for runtime execution
-COPY packages/api/src/migrate-barcodes.ts ./packages/api/src/
-
 # Create data directory and fix permissions for node user
 RUN mkdir -p /data && \
     chown -R node:node /data && \
@@ -79,5 +76,5 @@ WORKDIR /app/packages/api
 
 EXPOSE 3000
 
-# Initialize database, run migrations, and start server
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npx tsx src/migrate-barcodes.ts 2>/dev/null || true && node dist/index.js"]
+# Initialize database and start server
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/index.js"]

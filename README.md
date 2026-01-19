@@ -10,7 +10,6 @@ A private, offline-capable PWA for managing your household inventory. No cloud, 
 - **Expiry Warnings**: See what's expiring soon and what's already expired
 - **Low Stock Alerts**: Get notified when items fall below minimum stock levels
 - **FIFO Consumption**: Automatically consume oldest batches first
-- **Barcode Support**: Quickly find articles by scanning/entering barcodes
 - **Storage Locations**: Organize inventory by fridge, pantry, bathroom, etc.
 - **Nutrition Tracking**: Optional nutrition data per article
 - **Multi-language**: English and German support
@@ -156,7 +155,6 @@ Vorratio/
 │       └── build-and-push.yml  # CI/CD pipeline
 ├── docker-compose.yml
 ├── Dockerfile
-└── PLAN.md           # Development roadmap
 ```
 
 ## CI/CD
@@ -187,7 +185,6 @@ The workflow automatically builds and pushes the Docker image, so you always get
 ### Articles
 - `GET /api/articles` - List articles (with stock info)
 - `GET /api/articles/:id` - Get article details
-- `GET /api/articles/barcode/:code` - Find by barcode
 - `GET /api/articles/expiring?days=7` - Get expiring articles
 - `POST /api/articles` - Create article
 - `PUT /api/articles/:id` - Update article
@@ -210,8 +207,6 @@ The workflow automatically builds and pushes the Docker image, so you always get
 
 ## Roadmap
 
-See [PLAN.md](PLAN.md) for the detailed development roadmap.
-
 ### Completed (Phase 1)
 - Core inventory management
 - Batch tracking with FIFO consumption
@@ -223,7 +218,6 @@ See [PLAN.md](PLAN.md) for the detailed development roadmap.
 - Recipes & meal planning
 - Smart shopping list generation
 - Consumption forecasting
-- Barcode camera scanning
 - Nutrition summaries
 
 ## License
@@ -232,4 +226,4 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Please read the development plan in [PLAN.md](PLAN.md) before starting work on new features.
+Contributions are welcome!
