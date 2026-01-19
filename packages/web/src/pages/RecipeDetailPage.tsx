@@ -19,6 +19,7 @@ import {
   Calendar
 } from 'lucide-react';
 import ModalPortal from '../components/ModalPortal';
+import NutritionSummary from '../components/NutritionSummary';
 
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -150,10 +151,10 @@ export default function RecipeDetailPage() {
               </div>
             )}
 
-            {recipe.totalCalories !== undefined && recipe.totalCalories > 0 && (
+            {recipe.nutritionPerServing?.calories && recipe.nutritionPerServing.calories > 0 && (
               <div className="flex items-center gap-2">
                 <Flame size={18} className="text-red-500" />
-                <span>{Math.round(recipe.totalCalories / recipe.servings)} kcal / {t('recipe.servings').toLowerCase()}</span>
+                <span>{Math.round(recipe.nutritionPerServing.calories)} kcal / {t('recipe.servings').toLowerCase()}</span>
               </div>
             )}
           </div>
@@ -207,6 +208,37 @@ export default function RecipeDetailPage() {
           </ul>
         </div>
       )}
+
+      {/* Nutrition Info */}
+      {recipe.nutritionPerServing && (
+        recipe.nutritionPerServing.calories > 0 ||
+        recipe.nutritionPerServing.protein > 0 ||
+        recipe.nutritionPerServing.carbs > 0 ||
+        recipe.nutritionPerServing.fat > 0 ||
+        recipe.nutritionPerServing.fiber > 0
+      ) ? (
+        <div className="card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Flame size={20} className="text-orange-500" />
+            <h2 className="font-semibold text-lg text-gray-900">
+              {t('article.nutrition')}
+            </h2>
+            <span className="text-sm text-gray-500">
+              ({adjustedServings} {t('recipe.servings').toLowerCase()})
+            </span>
+          </div>
+          <NutritionSummary
+            data={{
+              calories: recipe.nutritionPerServing.calories,
+              protein: recipe.nutritionPerServing.protein,
+              carbs: recipe.nutritionPerServing.carbs,
+              fat: recipe.nutritionPerServing.fat,
+              fiber: recipe.nutritionPerServing.fiber,
+            }}
+            servings={adjustedServings}
+          />
+        </div>
+      ) : null}
 
       {/* Instructions */}
       {recipe.instructions && (

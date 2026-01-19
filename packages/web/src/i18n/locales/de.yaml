@@ -55,6 +55,7 @@ dashboard:
   expired: Abgelaufen
   lowStock: Niedriger Bestand
   todaysMeals: Heutige Mahlzeiten
+  todaysNutrition: "Heutige Nährwerte"
   shoppingPreview: Einkaufsliste
   noExpiring: Nichts läuft bald ab
   noLowStock: Alle Artikel ausreichend vorhanden

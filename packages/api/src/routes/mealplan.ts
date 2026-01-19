@@ -47,12 +47,58 @@ export async function mealPlanRoutes(fastify: FastifyInstance) {
             prepTime: true,
             cookTime: true,
             imageUrl: true,
+            ingredients: {
+              include: {
+                article: {
+                  select: {
+                    calories: true,
+                    protein: true,
+                    carbs: true,
+                    fat: true,
+                    fiber: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
     });
 
-    return entries;
+    // Calculate nutrition for each entry based on its servings
+    return entries.map((entry) => {
+      // Calculate total nutrition for the recipe
+      let totalNutrition = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
+
+      for (const ing of entry.recipe.ingredients) {
+        if (ing.article) {
+          const factor = ing.quantity / 100;
+          if (ing.article.calories) totalNutrition.calories += ing.article.calories * factor;
+          if (ing.article.protein) totalNutrition.protein += ing.article.protein * factor;
+          if (ing.article.carbs) totalNutrition.carbs += ing.article.carbs * factor;
+          if (ing.article.fat) totalNutrition.fat += ing.article.fat * factor;
+          if (ing.article.fiber) totalNutrition.fiber += ing.article.fiber * factor;
+        }
+      }
+
+      // Calculate nutrition for this meal plan entry's servings
+      const portionMultiplier = entry.servings / entry.recipe.servings;
+      const entryNutrition = {
+        calories: totalNutrition.calories * portionMultiplier,
+        protein: totalNutrition.protein * portionMultiplier,
+        carbs: totalNutrition.carbs * portionMultiplier,
+        fat: totalNutrition.fat * portionMultiplier,
+        fiber: totalNutrition.fiber * portionMultiplier,
+      };
+
+      // Return entry without ingredients (to keep response size small)
+      const { ingredients, ...recipeWithoutIngredients } = entry.recipe;
+      return {
+        ...entry,
+        recipe: recipeWithoutIngredients,
+        nutrition: entryNutrition,
+      };
+    });
   });
 
   // Get single meal plan entry

@@ -21,7 +21,11 @@ import {
   Users,
   Trash2,
   Undo2,
-  ExternalLink
+  ExternalLink,
+  Flame,
+  Beef,
+  Wheat,
+  Droplet
 } from 'lucide-react';
 import {
   format,
@@ -98,6 +102,30 @@ export default function MealPlanPage() {
     return entries.filter(
       e => isSameDay(parseISO(e.date), date) && e.mealType === mealType
     );
+  };
+
+  // Calculate total nutrition for a day
+  const getDayNutrition = (date: Date) => {
+    if (!entries) return null;
+    const dayEntries = entries.filter(e => isSameDay(parseISO(e.date), date));
+    if (dayEntries.length === 0) return null;
+
+    const totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    for (const entry of dayEntries) {
+      if (entry.nutrition) {
+        totals.calories += entry.nutrition.calories || 0;
+        totals.protein += entry.nutrition.protein || 0;
+        totals.carbs += entry.nutrition.carbs || 0;
+        totals.fat += entry.nutrition.fat || 0;
+      }
+    }
+
+    // Only return if we have some nutrition data
+    if (totals.calories === 0 && totals.protein === 0 && totals.carbs === 0 && totals.fat === 0) {
+      return null;
+    }
+
+    return totals;
   };
 
   const getMealTypeLabel = (type: MealType) => {
@@ -321,6 +349,53 @@ export default function MealPlanPage() {
                 })}
               </div>
             ))}
+
+            {/* Daily Nutrition Summary Row */}
+            <div className="grid grid-cols-8 gap-1 mt-2">
+              <div className="p-2 flex items-center justify-end">
+                <span className="text-xs font-medium text-gray-500">
+                  {t('article.calories')}
+                </span>
+              </div>
+              {daysInWeek.map((day) => {
+                const nutrition = getDayNutrition(day);
+                if (!nutrition) {
+                  return (
+                    <div
+                      key={`nutrition-${day.toISOString()}`}
+                      className="p-2 text-center text-xs text-gray-300"
+                    >
+                      -
+                    </div>
+                  );
+                }
+                return (
+                  <div
+                    key={`nutrition-${day.toISOString()}`}
+                    className="p-2 bg-gray-50 rounded-lg"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-center gap-1 text-xs" title={t('article.calories')}>
+                        <Flame size={10} className="text-orange-500" />
+                        <span className="font-medium">{Math.round(nutrition.calories)}</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1 text-xs" title={t('article.protein')}>
+                        <Beef size={10} className="text-red-500" />
+                        <span>{Math.round(nutrition.protein)}g</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1 text-xs" title={t('article.carbs')}>
+                        <Wheat size={10} className="text-amber-500" />
+                        <span>{Math.round(nutrition.carbs)}g</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1 text-xs" title={t('article.fat')}>
+                        <Droplet size={10} className="text-yellow-500" />
+                        <span>{Math.round(nutrition.fat)}g</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

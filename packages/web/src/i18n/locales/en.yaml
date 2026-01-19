@@ -55,6 +55,7 @@ dashboard:
   expired: Expired
   lowStock: Low Stock
   todaysMeals: Today's Meals
+  todaysNutrition: Today's Nutrition
   shoppingPreview: Shopping List
   noExpiring: Nothing expiring soon
   noLowStock: All items well stocked

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertTriangle, TrendingDown, ChevronRight, UtensilsCrossed, RefreshCw, Coffee, Sun, Moon, Cookie, Check, Plus, Trash2, Undo2, X, ExternalLink } from 'lucide-react';
+import { AlertTriangle, TrendingDown, ChevronRight, UtensilsCrossed, RefreshCw, Coffee, Sun, Moon, Cookie, Check, Plus, Trash2, Undo2, X, ExternalLink, Flame } from 'lucide-react';
 import { useTranslation } from '../i18n';
 import { dashboard, DashboardData, mealPlan, MealPlanEntry, MealType } from '../lib/api';
 import { cn, daysUntilExpiry } from '../lib/utils';
 import { format } from 'date-fns';
 import ModalPortal from '../components/ModalPortal';
+import NutritionSummary from '../components/NutritionSummary';
 
 const MEAL_TYPES: MealType[] = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
@@ -209,6 +210,47 @@ export default function DashboardPage() {
             );
           })}
         </div>
+
+        {/* Today's Nutrition Summary */}
+        {(() => {
+          const totalNutrition = todayMeals.reduce(
+            (acc, meal) => {
+              if (meal.nutrition) {
+                acc.calories += meal.nutrition.calories;
+                acc.protein += meal.nutrition.protein;
+                acc.carbs += meal.nutrition.carbs;
+                acc.fat += meal.nutrition.fat;
+                acc.fiber += meal.nutrition.fiber;
+              }
+              return acc;
+            },
+            { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
+          );
+
+          const hasNutrition = totalNutrition.calories > 0 || totalNutrition.protein > 0 ||
+                               totalNutrition.carbs > 0 || totalNutrition.fat > 0 || totalNutrition.fiber > 0;
+
+          if (!hasNutrition) return null;
+
+          return (
+            <div className="card p-4 mt-3">
+              <div className="flex items-center gap-2 mb-3">
+                <Flame size={18} className="text-orange-500" />
+                <span className="font-medium text-gray-700">{t('dashboard.todaysNutrition')}</span>
+              </div>
+              <NutritionSummary
+                data={{
+                  calories: totalNutrition.calories,
+                  protein: totalNutrition.protein,
+                  carbs: totalNutrition.carbs,
+                  fat: totalNutrition.fat,
+                  fiber: totalNutrition.fiber,
+                }}
+                compact
+              />
+            </div>
+          );
+        })()}
       </div>
 
       {/* Expiring Soon */}

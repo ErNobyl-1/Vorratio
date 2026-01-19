@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2, Plus, Minus, AlertTriangle, MapPin, Calendar, DollarSign, History, UtensilsCrossed, Flame, Package, Barcode, TrendingUp, TrendingDown, RefreshCw, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Plus, Minus, AlertTriangle, MapPin, Calendar, History, UtensilsCrossed, Flame, Package, Barcode, TrendingUp, TrendingDown, RefreshCw, ShoppingCart } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTranslation } from '../i18n';
 import { articles, batches, products as productsApi, consumption, Article, ConsumptionLog, Product, Batch } from '../lib/api';
@@ -195,7 +195,6 @@ export default function ArticleDetailPage() {
       {(article.lastPurchasePrice != null || article.avgPrice != null) && (
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-3">
-            <DollarSign size={20} className="text-green-600" />
             <h2 className="font-semibold">{t('price.title')}</h2>
             <span className="text-sm text-gray-500">
               ({t('price.perUnit', { unit: article.defaultUnit })})
@@ -392,8 +391,12 @@ export default function ArticleDetailPage() {
                     )}
                     {batch.purchasePrice !== null && (
                       <span className="flex items-center gap-1">
-                        <DollarSign size={14} />
                         {formatCurrency(batch.purchasePrice)}
+                        {batch.quantity > 0 && (
+                          <span className="text-gray-400">
+                            ({formatCurrency(batch.purchasePrice / batch.quantity)}/{article.defaultUnit})
+                          </span>
+                        )}
                       </span>
                     )}
                   </div>

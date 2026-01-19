@@ -3,6 +3,7 @@ import { prisma } from '../lib/db.js';
 import { z } from 'zod';
 import { startOfDay, endOfDay, parseISO } from 'date-fns';
 import { getForecastedShoppingItems } from '../lib/forecast.js';
+import { convertQuantityBetweenUnits } from './units.js';
 
 const CreateShoppingListSchema = z.object({
   name: z.string().max(200).optional(),
@@ -46,7 +47,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         items: {
           include: {
             article: {
-              select: { id: true, name: true, defaultUnit: true, category: true },
+              select: { id: true, name: true, defaultUnit: true, category: true, packageSize: true, packageUnit: true },
             },
           },
           orderBy: [{ isPurchased: 'asc' }, { article: { category: 'asc' } }],
@@ -78,6 +79,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         customName: item.customName,
         quantity: item.neededQuantity,
         purchasedQuantity: item.purchasedQuantity,
+        recommendedPacks: item.recommendedPacks,
         unit: item.article?.defaultUnit || 'pcs',
         reason: item.reason,
         estimatedPrice: item.estimatedPrice,
@@ -104,7 +106,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         items: {
           include: {
             article: {
-              select: { id: true, name: true, defaultUnit: true, category: true },
+              select: { id: true, name: true, defaultUnit: true, category: true, packageSize: true, packageUnit: true },
             },
           },
           orderBy: [{ isPurchased: 'asc' }, { article: { category: 'asc' } }],
@@ -136,6 +138,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         customName: item.customName,
         quantity: item.neededQuantity,
         purchasedQuantity: item.purchasedQuantity,
+        recommendedPacks: item.recommendedPacks,
         unit: item.article?.defaultUnit || 'pcs',
         reason: item.reason,
         estimatedPrice: item.estimatedPrice,
@@ -189,12 +192,13 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
     });
 
     // 2. Calculate required ingredients from meal plan
+    // We need to convert all quantities to the article's defaultUnit for proper comparison
     const requiredIngredients = new Map<string, {
       articleId: string | null;
       articleName: string | null;
       categoryMatch: string | null;
-      unit: string;
-      totalQuantity: number;
+      unit: string; // This will be the article's defaultUnit (or recipe unit if no article)
+      totalQuantity: number; // Quantity in the unit above
       reason: string;
     }>();
 
@@ -204,7 +208,23 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       for (const ing of entry.recipe.ingredients) {
         const key = ing.articleId || ing.categoryMatch || `unknown-${ing.id}`;
         const existing = requiredIngredients.get(key);
-        const neededQuantity = ing.quantity * portionMultiplier;
+        let neededQuantity = ing.quantity * portionMultiplier;
+
+        // Determine target unit: use article's defaultUnit if available
+        const targetUnit = ing.article?.defaultUnit || ing.unit;
+
+        // Convert recipe quantity to article's defaultUnit if they differ
+        if (ing.article?.defaultUnit && ing.unit !== ing.article.defaultUnit) {
+          const converted = await convertQuantityBetweenUnits(
+            neededQuantity,
+            ing.unit,
+            ing.article.defaultUnit
+          );
+          if (converted !== null) {
+            neededQuantity = converted;
+          }
+          // If conversion fails, we keep the original quantity (better than nothing)
+        }
 
         if (existing) {
           existing.totalQuantity += neededQuantity;
@@ -213,7 +233,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
             articleId: ing.articleId,
             articleName: ing.article?.name || null,
             categoryMatch: ing.categoryMatch,
-            unit: ing.unit,
+            unit: targetUnit,
             totalQuantity: neededQuantity,
             reason: 'RECIPE',
           });
@@ -236,9 +256,16 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
     });
 
     const stockMap = new Map<string, number>();
+    // Also store package info for recommendedPacks calculation
+    const packageInfoMap = new Map<string, { packageSize: number; packageUnit: string; defaultUnit: string }>();
     for (const article of articlesWithStock) {
       const totalStock = article.batches.reduce((sum: number, b: { quantity: number }) => sum + b.quantity, 0);
       stockMap.set(article.id, totalStock);
+      packageInfoMap.set(article.id, {
+        packageSize: article.packageSize,
+        packageUnit: article.packageUnit,
+        defaultUnit: article.defaultUnit,
+      });
     }
 
     // 4. Get forecasted consumption for consumable articles
@@ -265,10 +292,17 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
     for (const article of allArticlesWithMinStock) {
       if (article.minStock) {
         minStockMap.set(article.id, article.minStock);
-        // Also add to stockMap if not already there
+        // Also add to stockMap and packageInfoMap if not already there
         if (!stockMap.has(article.id)) {
           const totalStock = article.batches.reduce((sum: number, b: { quantity: number }) => sum + b.quantity, 0);
           stockMap.set(article.id, totalStock);
+        }
+        if (!packageInfoMap.has(article.id)) {
+          packageInfoMap.set(article.id, {
+            packageSize: article.packageSize,
+            packageUnit: article.packageUnit,
+            defaultUnit: article.defaultUnit,
+          });
         }
       }
     }
@@ -281,8 +315,41 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       articleId: string | null;
       customName: string | null;
       neededQuantity: number;
+      recommendedPacks: number;
       reason: string;
     }[] = [];
+
+    // Helper to round to avoid floating-point errors (round to 4 decimals, then display 2)
+    const roundQuantity = (n: number) => Math.round(n * 10000) / 10000;
+
+    // Helper to calculate recommended packs based on package size
+    // Returns how many packages to buy to cover the needed quantity
+    const calculateRecommendedPacks = async (
+      articleId: string | null,
+      neededQuantity: number,
+      neededUnit: string
+    ): Promise<number> => {
+      if (!articleId) return 1;
+
+      const pkgInfo = packageInfoMap.get(articleId);
+      if (!pkgInfo || pkgInfo.packageSize <= 0) return 1;
+
+      // Convert package size to the same unit as neededQuantity if different
+      let packageSizeInNeededUnit = pkgInfo.packageSize;
+      if (pkgInfo.packageUnit !== neededUnit) {
+        const converted = await convertQuantityBetweenUnits(
+          pkgInfo.packageSize,
+          pkgInfo.packageUnit,
+          neededUnit
+        );
+        if (converted !== null) {
+          packageSizeInNeededUnit = converted;
+        }
+      }
+
+      // Calculate how many packages needed (round up)
+      return Math.ceil(neededQuantity / packageSizeInNeededUnit);
+    };
 
     // Track which articles we've already processed
     const processedArticles = new Set<string>();
@@ -297,14 +364,16 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       // Total need = recipe requirement + forecasted consumption + minStock buffer - currentStock
       // We want: currentStock + purchase - recipeNeed - forecastedNeed >= minStock
       // Therefore: purchase >= recipeNeed + forecastedNeed + minStock - currentStock
-      const totalNeed = req.totalQuantity + forecastedNeed + minStock - currentStock;
+      const totalNeed = roundQuantity(req.totalQuantity + forecastedNeed + minStock - currentStock);
 
       if (totalNeed > 0) {
+        const recommendedPacks = await calculateRecommendedPacks(req.articleId, totalNeed, req.unit);
         itemsToCreate.push({
           articleId: req.articleId,
           customName: req.articleName || req.categoryMatch,
-          neededQuantity: Math.ceil(totalNeed * 100) / 100, // Round to 2 decimals
-          reason: req.reason, // Keep RECIPE as reason since that's the primary driver
+          neededQuantity: Math.round(totalNeed * 100) / 100, // Round to 2 decimals for display
+          recommendedPacks,
+          reason: req.reason,
         });
       }
 
@@ -319,15 +388,19 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
 
       const currentStock = stockMap.get(item.articleId) || 0;
       const minStock = minStockMap.get(item.articleId) || 0;
+      const pkgInfo = packageInfoMap.get(item.articleId);
+      const unit = pkgInfo?.defaultUnit || 'pcs';
 
       // Need = forecastedConsumption + minStock - currentStock
-      const totalNeed = item.quantity + minStock - currentStock;
+      const totalNeed = roundQuantity(item.quantity + minStock - currentStock);
 
       if (totalNeed > 0) {
+        const recommendedPacks = await calculateRecommendedPacks(item.articleId, totalNeed, unit);
         itemsToCreate.push({
           articleId: item.articleId,
           customName: null,
-          neededQuantity: Math.ceil(totalNeed * 100) / 100,
+          neededQuantity: Math.round(totalNeed * 100) / 100,
+          recommendedPacks,
           reason: 'FORECAST',
         });
       }
@@ -341,10 +414,13 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
 
       const totalStock = article.batches.reduce((sum: number, b: { quantity: number }) => sum + b.quantity, 0);
       if (article.minStock && totalStock < article.minStock) {
+        const neededQuantity = roundQuantity(article.minStock - totalStock);
+        const recommendedPacks = await calculateRecommendedPacks(article.id, neededQuantity, article.defaultUnit);
         itemsToCreate.push({
           articleId: article.id,
           customName: null,
-          neededQuantity: article.minStock - totalStock,
+          neededQuantity: Math.round(neededQuantity * 100) / 100,
+          recommendedPacks,
           reason: 'LOW_STOCK',
         });
       }
@@ -366,19 +442,19 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       },
     });
 
-    const priceMap = new Map<string, { avgPrice: number; hasPrice: boolean }>();
+    // Calculate average price per PACK (not per unit) from purchase history
+    // Each batch represents one purchase/pack, so we average the batch prices
+    const priceMap = new Map<string, { avgPricePerPack: number; hasPrice: boolean }>();
     for (const article of articlesWithPrices) {
       const batchesWithPrice = article.batches.filter((b: { purchasePrice: number | null }) => b.purchasePrice !== null);
       if (batchesWithPrice.length > 0) {
-        // Calculate average price per unit from purchase history
-        const totalPrice = batchesWithPrice.reduce((sum: number, b: { purchasePrice: number | null; initialQuantity: number }) =>
+        // Average price per pack (each batch is typically one pack purchase)
+        const totalPrice = batchesWithPrice.reduce((sum: number, b: { purchasePrice: number | null }) =>
           sum + (b.purchasePrice || 0), 0);
-        const totalQuantity = batchesWithPrice.reduce((sum: number, b: { initialQuantity: number }) =>
-          sum + b.initialQuantity, 0);
-        const avgPricePerUnit = totalQuantity > 0 ? totalPrice / totalQuantity : 0;
-        priceMap.set(article.id, { avgPrice: avgPricePerUnit, hasPrice: true });
+        const avgPricePerPack = totalPrice / batchesWithPrice.length;
+        priceMap.set(article.id, { avgPricePerPack, hasPrice: true });
       } else {
-        priceMap.set(article.id, { avgPrice: 0, hasPrice: false });
+        priceMap.set(article.id, { avgPricePerPack: 0, hasPrice: false });
       }
     }
 
@@ -391,13 +467,15 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         items: {
           create: itemsToCreate.map((item) => {
             const priceInfo = item.articleId ? priceMap.get(item.articleId) : null;
+            // Price is based on recommended packs, not the raw quantity
             const estimatedPrice = priceInfo?.hasPrice
-              ? Math.round(priceInfo.avgPrice * item.neededQuantity * 100) / 100
+              ? Math.round(priceInfo.avgPricePerPack * item.recommendedPacks * 100) / 100
               : null;
             return {
               articleId: item.articleId,
               customName: item.customName,
               neededQuantity: item.neededQuantity,
+              recommendedPacks: item.recommendedPacks,
               reason: item.reason,
               estimatedPrice,
             };
@@ -408,7 +486,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         items: {
           include: {
             article: {
-              select: { id: true, name: true, defaultUnit: true, category: true },
+              select: { id: true, name: true, defaultUnit: true, category: true, packageSize: true, packageUnit: true },
             },
           },
         },
@@ -431,6 +509,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         customName: item.customName,
         quantity: item.neededQuantity,
         purchasedQuantity: item.purchasedQuantity,
+        recommendedPacks: item.recommendedPacks,
         unit: item.article?.defaultUnit || 'pcs',
         reason: item.reason,
         estimatedPrice: item.estimatedPrice,
@@ -472,7 +551,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       },
       include: {
         article: {
-          select: { id: true, name: true, defaultUnit: true, category: true },
+          select: { id: true, name: true, defaultUnit: true, category: true, packageSize: true, packageUnit: true },
         },
       },
     });
@@ -486,6 +565,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
       customName: item.customName,
       quantity: item.neededQuantity,
       purchasedQuantity: item.purchasedQuantity,
+      recommendedPacks: item.recommendedPacks,
       unit: item.article?.defaultUnit || 'pcs',
       reason: item.reason,
       estimatedPrice: item.estimatedPrice,
@@ -551,7 +631,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         },
         include: {
           article: {
-            select: { id: true, name: true, defaultUnit: true, category: true },
+            select: { id: true, name: true, defaultUnit: true, category: true, packageSize: true, packageUnit: true },
           },
         },
       });
@@ -565,6 +645,7 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         customName: item.customName,
         quantity: item.neededQuantity,
         purchasedQuantity: item.purchasedQuantity,
+        recommendedPacks: item.recommendedPacks,
         unit: item.article?.defaultUnit || 'pcs',
         reason: item.reason,
         estimatedPrice: item.estimatedPrice,

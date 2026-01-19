@@ -644,7 +644,15 @@ function ShoppingItemRow({
                 }}
                 className="flex items-center gap-1 hover:text-primary-600"
               >
-                <span>{item.quantity} {item.unit}</span>
+                {/* Show recommended packs if available, otherwise show raw quantity */}
+                {item.recommendedPacks && item.recommendedPacks > 0 && item.article?.packageSize ? (
+                  <span>
+                    {item.recommendedPacks}× {item.article.packageSize} {item.article.packageUnit || item.unit}
+                    <span className="text-gray-400 ml-1">({item.quantity} {item.unit})</span>
+                  </span>
+                ) : (
+                  <span>{item.quantity} {item.unit}</span>
+                )}
                 {!item.purchased && <Edit size={10} />}
               </button>
             )}

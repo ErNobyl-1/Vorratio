@@ -381,6 +381,14 @@ export interface RecipeIngredient {
   optional: boolean;
 }
 
+export interface RecipeNutrition {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+}
+
 export interface Recipe {
   id: string;
   name: string;
@@ -394,7 +402,11 @@ export interface Recipe {
   createdAt: string;
   updatedAt: string;
   ingredients?: RecipeIngredient[];
-  // Computed nutrition
+  // Computed nutrition (total for entire recipe)
+  nutrition?: RecipeNutrition;
+  // Computed nutrition per serving
+  nutritionPerServing?: RecipeNutrition;
+  // Legacy fields (deprecated, use nutrition/nutritionPerServing instead)
   totalCalories?: number;
   totalProtein?: number;
   totalCarbs?: number;
@@ -469,6 +481,14 @@ export const recipes = {
 // Meal Plan
 export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
 
+export interface MealPlanNutrition {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+}
+
 export interface MealPlanEntry {
   id: string;
   date: string;
@@ -486,6 +506,7 @@ export interface MealPlanEntry {
   notes: string | null;
   completedAt: string | null;
   createdAt: string;
+  nutrition?: MealPlanNutrition;
 }
 
 export interface CreateMealPlanInput {
@@ -550,10 +571,11 @@ export interface ShoppingListItem {
   id: string;
   shoppingListId: string;
   articleId: string | null;
-  article: { id: string; name: string; defaultUnit: string; category: string | null } | null;
+  article: { id: string; name: string; defaultUnit: string; category: string | null; packageSize?: number; packageUnit?: string } | null;
   customName: string | null;
   quantity: number;
   purchasedQuantity?: number | null;
+  recommendedPacks?: number;
   unit: string;
   reason: ShoppingItemReason;
   estimatedPrice: number | null;

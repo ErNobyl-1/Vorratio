@@ -239,11 +239,6 @@ function ArticleCard({
           )}>
             {formatQuantity(article.totalStock || 0, article.defaultUnit)}
           </span>
-          {article.batchCount && article.batchCount > 0 && (
-            <span className="text-gray-400">
-              ({article.batchCount} {article.batchCount === 1 ? 'batch' : 'batches'})
-            </span>
-          )}
         </div>
       </div>
       <ChevronRight size={20} className="text-gray-400 flex-shrink-0" />
