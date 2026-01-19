@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+*.db
+*.db-journal
+.env
+.env.*
+.git
+.gitignore
+.claude
+*.md
+*.log
+coverage
+.vscode
+.idea

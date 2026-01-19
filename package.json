@@ -1,0 +1,32 @@
+{
+  "name": "vorratio",
+  "version": "1.0.0",
+  "description": "Smart home inventory management - track what you have, what you consume, and what you need to buy.",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev -w @vorratio/api",
+    "dev:web": "npm run dev -w @vorratio/web",
+    "build": "npm run build -w @vorratio/api && npm run build -w @vorratio/web",
+    "build:api": "npm run build -w @vorratio/api",
+    "build:web": "npm run build -w @vorratio/web",
+    "start": "npm run start -w @vorratio/api",
+    "db:generate": "npm run db:generate -w @vorratio/api",
+    "db:migrate": "npm run db:migrate -w @vorratio/api",
+    "db:push": "npm run db:push -w @vorratio/api",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.55.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

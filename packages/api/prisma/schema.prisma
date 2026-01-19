@@ -1,0 +1,255 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== Core Entities ====================
+
+model StorageLocation {
+  id        String    @id @default(uuid())
+  name      String
+  icon      String?
+  sortOrder Int       @default(0)
+  articles  Article[]
+}
+
+model Article {
+  id              String    @id @default(uuid())
+  name            String
+  defaultUnit     String    @default("pcs") // pcs, g, ml, kg, l
+  packageSize     Float     @default(1)
+  packageUnit     String    @default("pcs")
+
+  locationId      String?
+  location        StorageLocation? @relation(fields: [locationId], references: [id])
+
+  minStock        Float?    // Alert when below this
+  defaultExpiryDays Int?    // Auto-calculate expiry on purchase
+
+  // Nutrition per 100g/100ml (optional)
+  calories        Float?
+  protein         Float?
+  carbs           Float?
+  fat             Float?
+  fiber           Float?
+
+  category        String?   // For flexible recipe matching
+  isConsumable    Boolean   @default(true) // false for non-food items
+  sortOrder       Int       @default(0)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  batches         Batch[]
+  consumptionLogs ConsumptionLog[]
+  recipeIngredients RecipeIngredient[]
+  shoppingItems   ShoppingListItem[]
+  products        Product[] // Specific products/variants with barcodes
+
+  @@index([locationId])
+  @@index([category])
+}
+
+// Product: A specific variant of an Article with its own barcode
+// Example: Article "Nudeln" can have Products "Barilla Spaghetti 500g", "De Cecco Penne 500g"
+model Product {
+  id              String    @id @default(uuid())
+  articleId       String
+  article         Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  name            String    // e.g., "Barilla Spaghetti"
+  barcode         String?   @unique
+  brand           String?   // e.g., "Barilla"
+  packageSize     Float?    // Override article's packageSize if different
+  packageUnit     String?   // Override article's packageUnit if different
+  imageUrl        String?
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([articleId])
+  @@index([barcode])
+}
+
+model Batch {
+  id              String    @id @default(uuid())
+  articleId       String
+  article         Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  quantity        Float     // Current quantity in defaultUnit
+  initialQuantity Float     // Original quantity when purchased
+  purchaseDate    DateTime  @default(now())
+  expiryDate      DateTime?
+  purchasePrice   Float?    // Price for this batch
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+
+  consumptionLogs ConsumptionLog[]
+
+  @@index([articleId])
+  @@index([expiryDate])
+}
+
+model ConsumptionLog {
+  id         String   @id @default(uuid())
+  articleId  String
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  batchId    String?
+  batch      Batch?   @relation(fields: [batchId], references: [id], onDelete: SetNull)
+
+  quantity   Float
+  consumedAt DateTime @default(now())
+  source     String   @default("MANUAL") // MANUAL, RECIPE, EXPIRED, WASTE
+  recipeId   String?  // If consumed via recipe
+  notes      String?
+
+  @@index([articleId])
+  @@index([consumedAt])
+}
+
+// ==================== Recipes & Meal Planning ====================
+
+model Recipe {
+  id           String    @id @default(uuid())
+  name         String
+  description  String?
+  servings     Int       @default(2)
+  instructions String?   // Markdown or plain text
+  prepTime     Int?      // Minutes
+  cookTime     Int?      // Minutes
+  imageUrl     String?
+  tags         String?   // Comma-separated: "quick,vegetarian,dinner"
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  ingredients     RecipeIngredient[]
+  mealPlanEntries MealPlanEntry[]
+}
+
+model RecipeIngredient {
+  id            String   @id @default(uuid())
+  recipeId      String
+  recipe        Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  // Either specific article OR category match
+  articleId     String?
+  article       Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  categoryMatch String?  // e.g., "pasta" matches any article with category "pasta"
+
+  quantity      Float
+  unit          String   // Same units as Article.defaultUnit
+  isOptional    Boolean  @default(false)
+  notes         String?  // "finely chopped", "room temperature"
+
+  @@index([recipeId])
+  @@index([articleId])
+}
+
+model MealPlanEntry {
+  id          String    @id @default(uuid())
+  date        DateTime
+  mealType    String    // BREAKFAST, LUNCH, DINNER, SNACK
+
+  recipeId    String
+  recipe      Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  servings    Int       // Can differ from recipe default
+  notes       String?
+  completedAt DateTime? // When meal was prepared
+
+  createdAt   DateTime  @default(now())
+
+  // No unique constraint - multiple recipes allowed per date/mealType
+  @@index([date])
+  @@index([date, mealType])
+  @@index([recipeId])
+}
+
+// ==================== Shopping ====================
+
+model ShoppingList {
+  id            String   @id @default(uuid())
+  name          String   @default("Shopping List")
+  shopDate      DateTime // When you plan to shop
+  planUntilDate DateTime // Calculate needs until this date
+  status        String   @default("ACTIVE") // ACTIVE, COMPLETED
+
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  items         ShoppingListItem[]
+}
+
+model ShoppingListItem {
+  id                String       @id @default(uuid())
+  listId            String
+  list              ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  // Either linked article or custom item
+  articleId         String?
+  article           Article?     @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  customName        String?
+
+  neededQuantity    Float        // In article's defaultUnit
+  recommendedPacks  Int          @default(1)
+  estimatedPrice    Float?
+
+  isPurchased       Boolean      @default(false)
+  purchasedQuantity Float?
+  actualPrice       Float?
+  purchaseDate      DateTime?    // When the item was purchased
+  expiryDate        DateTime?    // Expiry date for the purchased batch
+
+  reason            String       // RECIPE, LOW_STOCK, FORECAST, MANUAL
+  reasonDetails     String?      // e.g., "Recipe: Spaghetti Bolognese"
+
+  @@index([listId])
+  @@index([articleId])
+}
+
+// ==================== Settings ====================
+
+model AppSettings {
+  id              String   @id @default("app")
+  password        String   // Hashed with salt
+  locale          String   @default("en")
+  defaultShopDay  Int      @default(6) // 0=Sun, 6=Sat
+  currency        String   @default("EUR")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ==================== Units ====================
+
+model Unit {
+  id            String   @id @default(uuid())
+  symbol        String   @unique  // e.g., "kg", "g", "ml", "l", "pcs", "Rolle"
+  name          String             // Display name, e.g., "Kilogramm", "Gram"
+  isDefault     Boolean  @default(false)  // Whether this is a system default unit
+
+  // Conversion support - units in the same group can be converted
+  // e.g., "mass" for kg/g, "volume" for l/ml, null for non-convertible (pcs, Rolle)
+  conversionGroup String?
+
+  // Factor to convert to the base unit of the group
+  // For mass: g is base (factor=1), kg has factor=1000 (1kg = 1000g)
+  // For volume: ml is base (factor=1), l has factor=1000 (1l = 1000ml)
+  conversionFactor Float   @default(1)
+
+  // Custom conversion to another unit (for custom units like "1 Rolle = 50 Blatt")
+  convertsToUnitId String?
+  convertsToUnit   Unit?   @relation("UnitConversion", fields: [convertsToUnitId], references: [id])
+  convertedFromUnits Unit[] @relation("UnitConversion")
+  convertsToAmount Float?  // e.g., 50 (1 Rolle = 50 Blatt)
+
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

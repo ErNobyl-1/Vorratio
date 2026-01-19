@@ -1,0 +1,29 @@
+services:
+  vorratio-app:
+    build:
+      context: .
+      args:
+        VITE_DEFAULT_LOCALE: ${VITE_DEFAULT_LOCALE:-en}
+    container_name: vorratio
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8124}:3000"
+    volumes:
+      - vorratio-data:/data
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/data/vorratio.db
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-changeme}
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-secret-in-production}
+      - DEFAULT_LOCALE=${DEFAULT_LOCALE:-en}
+      - TZ=Europe/Berlin
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  vorratio-data:
+    name: vorratio-data

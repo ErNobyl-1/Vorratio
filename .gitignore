@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Database - NEVER commit these!
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+data/
+/data
+
+# Environment - NEVER commit these!
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Secrets - NEVER commit these!
+*.pem
+*.key
+*.crt
+secrets/
+credentials.json
+auth.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+
+# Lock files (use npm ci in CI/CD)
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Docker volumes and data
+.docker-data/
+docker-data/
+volumes/
