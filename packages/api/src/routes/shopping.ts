@@ -210,8 +210,8 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         const existing = requiredIngredients.get(key);
         let neededQuantity = ing.quantity * portionMultiplier;
 
-        // Determine target unit: use article's defaultUnit if available
-        const targetUnit = ing.article?.defaultUnit || ing.unit;
+        // Determine target unit: use article's defaultUnit if available, but only if conversion succeeds
+        let targetUnit = ing.unit;
 
         // Convert recipe quantity to article's defaultUnit if they differ
         if (ing.article?.defaultUnit && ing.unit !== ing.article.defaultUnit) {
@@ -222,8 +222,12 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
           );
           if (converted !== null) {
             neededQuantity = converted;
+            targetUnit = ing.article.defaultUnit;
           }
-          // If conversion fails, we keep the original quantity (better than nothing)
+          // If conversion fails, keep the original unit AND quantity to maintain consistency
+        } else if (ing.article?.defaultUnit) {
+          // Same unit, use article's defaultUnit
+          targetUnit = ing.article.defaultUnit;
         }
 
         if (existing) {
@@ -344,6 +348,10 @@ export async function shoppingRoutes(fastify: FastifyInstance) {
         );
         if (converted !== null) {
           packageSizeInNeededUnit = converted;
+        } else {
+          // Units are incompatible (e.g., liters vs pieces) - cannot calculate packs reliably
+          // Fall back to 1 pack as a safe default
+          return 1;
         }
       }
 
