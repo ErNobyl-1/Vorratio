@@ -1,0 +1,298 @@
+app:
+  name: Vorratio
+  tagline: Smart home inventory
+
+common:
+  save: Save
+  cancel: Cancel
+  delete: Delete
+  edit: Edit
+  add: Add
+  search: Search
+  loading: Loading...
+  error: Error
+  retry: Retry
+  confirm: Confirm
+  close: Close
+  back: Back
+  yes: "Yes"
+  no: "No"
+  ok: OK
+  or: or
+  and: and
+  items: "{count} items"
+  items_plural: "{count} items"
+  noData: No data available
+
+nav:
+  dashboard: Dashboard
+  inventory: Inventory
+  recipes: Recipes
+  mealPlan: Meal Plan
+  shopping: Shopping
+  scan: Scan
+  settings: Settings
+  more: More
+
+auth:
+  password: Password
+  passwordPlaceholder: Enter your password
+  login: Login
+  loggingIn: Logging in...
+  logout: Logout
+  wrongPassword: Wrong password
+  loginFailed: Login failed
+  changePassword: Change Password
+  currentPassword: Current Password
+  newPassword: New Password
+  confirmPassword: Confirm Password
+  passwordChanged: Password changed successfully
+  passwordMismatch: Passwords do not match
+
+dashboard:
+  title: Dashboard
+  expiringSoon: Expiring Soon
+  expired: Expired
+  lowStock: Low Stock
+  todaysMeals: Today's Meals
+  todaysNutrition: Today's Nutrition
+  shoppingPreview: Shopping List
+  noExpiring: Nothing expiring soon
+  noLowStock: All items well stocked
+  noMeals: No meals planned
+  noMealPlanned: Not planned
+  viewAll: View all
+  stats:
+    articles: Articles
+    batches: Batches
+    locations: Locations
+    recipes: Recipes
+
+inventory:
+  title: Inventory
+  addArticle: Add Article
+  searchPlaceholder: Search articles...
+  totalItems: "{count} items"
+  emptyLocation: No items in this location
+  empty: No articles yet
+  allLocations: All Locations
+  noLocation: No Location
+  stock: Stock
+  expiry: Expiry
+
+article:
+  name: Name
+  barcode: Barcode
+  location: Location
+  packageSize: Package Size
+  unit: Unit
+  unitDefault: Unit (default)
+  minStock: Minimum Stock
+  minStockHelp: Alert when below this amount
+  expiryDefault: Default Expiry (days)
+  expiryDefaultHelp: Auto-calculate expiry on purchase
+  category: Category
+  categoryPlaceholder: "e.g. dairy, pasta, cleaning"
+  isConsumable: Consumable Item
+  isConsumableHelp: Calculates predicted demand from consumption history
+  batches: Batches
+  addBatch: Add Purchase
+  consume: Consume
+  details: Article Details
+  edit: Edit Article
+  create: New Article
+  delete: Delete Article
+  deleteConfirm: Are you sure you want to delete this article?
+  noStock: No stock
+  nutrition: Nutrition (per 100g/ml)
+  calories: Calories
+  protein: Protein
+  carbs: Carbohydrates
+  fat: Fat
+  fiber: Fiber
+  usedInRecipes: Used in Recipes
+
+batch:
+  quantity: Quantity
+  purchaseDate: Purchase Date
+  expiryDate: Expiry Date
+  price: Price
+  notes: Notes
+  expires: "Expires {date}"
+  expired: Expired
+  expiresIn: "Expires in {days} days"
+  expiresInOne: "Expires in 1 day"
+  expiresToday: Expires today
+  addPurchase: Add Purchase
+  edit: Edit Batch
+  editPurchase: Edit Purchase
+  delete: Delete Batch
+  deleteConfirm: Are you sure you want to delete this batch?
+  consumeAmount: Amount to consume
+  remaining: "Remaining: {amount}"
+  noExpiryHint: Leave empty for items that don't expire
+  alreadyConsumed: "Warning: {amount} has already been consumed"
+  minQuantityHint: "Minimum: {amount} (already consumed)"
+
+location:
+  title: Storage Locations
+  add: Add Location
+  edit: Edit Location
+  delete: Delete Location
+  deleteConfirm: Are you sure you want to delete this location?
+  deleteHasArticles: Cannot delete location with articles
+  name: Name
+  icon: Icon
+  empty: No locations yet
+
+product:
+  title: Products
+  add: Add Product
+  edit: Edit Product
+  delete: Delete Product
+  deleteConfirm: Are you sure you want to delete this product?
+  name: Product Name
+  namePlaceholder: "e.g. Barilla Spaghetti"
+  brand: Brand
+  brandPlaceholder: "e.g. Barilla"
+  barcode: Barcode
+  empty: No products yet. Add a product to track specific variants with barcodes.
+
+recipe:
+  title: Recipes
+  add: Add Recipe
+  edit: Edit Recipe
+  delete: Delete Recipe
+  deleteConfirm: Are you sure you want to delete this recipe?
+  name: Name
+  description: Description
+  servings: Servings
+  prepTime: Prep Time
+  cookTime: Cook Time
+  instructions: Instructions
+  instructionsPlaceholder: "Step 1: ..."
+  ingredients: Ingredients
+  ingredientsEmpty: No ingredients added yet. Click the button above to add one.
+  addIngredient: Add Ingredient
+  cook: Cook Now
+  empty: No recipes yet
+
+mealPlan:
+  title: Meal Plan
+  breakfast: Breakfast
+  lunch: Lunch
+  dinner: Dinner
+  snack: Snack
+  addMeal: Add Meal
+  removeMeal: Remove Meal
+  empty: No meals planned
+  mealType: Meal Type
+  selectRecipe: Recipe
+  markCooked: Mark as cooked
+  markNotCooked: Not cooked (undo)
+  viewRecipe: View Recipe
+  cooked: Cooked
+
+shopping:
+  title: Shopping List
+  shopDate: Shopping Date
+  planUntil: Plan Until
+  estimatedTotal: "Estimated Total: {amount}"
+  generateList: Generate List
+  generateDescription: This will analyze your meal plan and inventory to create a smart shopping list.
+  completeShop: Complete Shopping
+  addItem: Add Item
+  empty: Shopping list is empty
+  itemReason:
+    recipe: For recipe
+    lowStock: Low stock
+    forecast: Predicted need
+    manual: Added manually
+  purchased: Purchased
+  remaining: Remaining
+
+settings:
+  title: Settings
+  language: Language
+  languageHelp: Choose your preferred language
+  password: App Password
+  defaultShopDay: Default Shopping Day
+  currency: Currency
+  theme: Theme
+  themeHelp: Choose your preferred theme
+  themeLight: Light
+  themeDark: Dark
+  themeSystem: System
+  english: English
+  german: German
+  sunday: Sunday
+  monday: Monday
+  tuesday: Tuesday
+  wednesday: Wednesday
+  thursday: Thursday
+  friday: Friday
+  saturday: Saturday
+  locations: Storage Locations
+  locationsHelp: Manage your storage locations
+  units: Units
+  unitsHelp: Manage measurement units
+  addUnit: Add Unit
+  editUnit: Edit Unit
+  unitName: Unit name
+  unitSymbol: Symbol
+  defaultUnits: Default
+  deleteUnitConfirm: "This unit may be used in articles or recipes. Delete anyway?"
+  customUnits: Custom units
+  conversionGroup: Conversion Group
+  conversionGroupHelp: Units in the same group can be converted to each other
+  noConversion: No conversion
+  conversionFactor: Conversion Factor
+  conversionFactorHelp: How many base units equal this unit?
+  baseUnit: Base unit
+  customConversion: Custom Conversion
+  customConversionHelp: "Define a conversion to another unit (e.g., 1 Roll = 50 Sheets)"
+  selectUnit: Select unit
+
+consumption:
+  history: Consumption History
+  edit: Edit Consumption
+  date: Date & Time
+  source:
+    manual: Manual
+    recipe: Recipe
+    expired: Expired
+    waste: Waste
+    correction: Correction
+
+activity:
+  history: Activity History
+  purchase: Purchase
+  consumption: Consumption
+  correction: Correction
+  added: added
+  consumed: consumed
+  corrected: corrected
+
+stock:
+  correction: Stock Correction
+  correctTitle: Correct Stock
+  actualStock: Actual Stock
+  currentStock: Current Stock
+  difference: Difference
+  notes: Notes (optional)
+  notesPlaceholder: "e.g. inventory count, shrinkage"
+
+price:
+  title: Price Information
+  lastPrice: Last Unit Price
+  avgPrice: Avg Unit Price
+  priceHistory: Price History
+  noPrice: No price recorded
+  perUnit: "per {unit}"
+
+expiry:
+  expired: Expired
+  today: Today
+  tomorrow: Tomorrow
+  days: "{days} days"
+  unknown: No expiry

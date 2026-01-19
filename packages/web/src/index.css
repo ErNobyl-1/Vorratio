@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #213547;
+  background-color: #f8fafc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+.dark {
+  color-scheme: dark;
+  color: #e2e8f0;
+  background-color: #0f172a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@layer components {
+  /* Base button styles - included in all btn-* variants */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .btn-success,
+  .btn-outline {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400;
+    @apply dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
+  }
+
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 active:bg-green-800;
+  }
+
+  .btn-outline {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100;
+    @apply dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100;
+    @apply dark:bg-gray-800 dark:border-gray-700;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all;
+    @apply dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply dark:text-gray-300;
+  }
+
+  /* Article cards */
+  .article-card {
+    @apply card p-4 flex items-center gap-3 transition-all duration-150 cursor-pointer;
+  }
+
+  .article-card:hover {
+    @apply shadow-md border-primary-200;
+    @apply dark:border-primary-700;
+  }
+
+  /* Badges */
+  .badge {
+    @apply px-2 py-0.5 text-xs font-medium rounded-full;
+  }
+
+  .badge-danger {
+    @apply bg-red-100 text-red-700;
+    @apply dark:bg-red-900/50 dark:text-red-400;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-700;
+    @apply dark:bg-yellow-900/50 dark:text-yellow-400;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-700;
+    @apply dark:bg-green-900/50 dark:text-green-400;
+  }
+
+  .badge-info {
+    @apply bg-blue-100 text-blue-700;
+    @apply dark:bg-blue-900/50 dark:text-blue-400;
+  }
+
+  .badge-purple {
+    @apply bg-purple-100 text-purple-700;
+    @apply dark:bg-purple-900/50 dark:text-purple-400;
+  }
+
+  .badge-expired {
+    @apply bg-red-500 text-white;
+  }
+
+  /* Stock indicator */
+  .stock-ok {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .stock-low {
+    @apply text-yellow-600 dark:text-yellow-400;
+  }
+
+  .stock-empty {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  /* Safe area for mobile */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Dark mode background */
+.dark .min-h-screen {
+  @apply bg-slate-900;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-slate-900;
+}
+
+/* Barcode scanner animation */
+@keyframes scan {
+  0% {
+    top: 10%;
+  }
+  50% {
+    top: 90%;
+  }
+  100% {
+    top: 10%;
+  }
+}
+
+.animate-scan {
+  animation: scan 2s ease-in-out infinite;
+}

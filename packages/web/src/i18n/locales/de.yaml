@@ -1,0 +1,298 @@
+app:
+  name: Vorratio
+  tagline: Smarte Vorratsverwaltung
+
+common:
+  save: Speichern
+  cancel: Abbrechen
+  delete: "Löschen"
+  edit: Bearbeiten
+  add: "Hinzufügen"
+  search: Suchen
+  loading: Laden...
+  error: Fehler
+  retry: Erneut versuchen
+  confirm: "Bestätigen"
+  close: "Schließen"
+  back: "Zurück"
+  yes: Ja
+  no: Nein
+  ok: OK
+  or: oder
+  and: und
+  items: "{count} Artikel"
+  items_plural: "{count} Artikel"
+  noData: Keine Daten vorhanden
+
+nav:
+  dashboard: "Übersicht"
+  inventory: Inventar
+  recipes: Rezepte
+  mealPlan: Essensplan
+  shopping: Einkauf
+  scan: Scannen
+  settings: Einstellungen
+  more: Mehr
+
+auth:
+  password: Passwort
+  passwordPlaceholder: Passwort eingeben
+  login: Anmelden
+  loggingIn: Anmeldung...
+  logout: Abmelden
+  wrongPassword: Falsches Passwort
+  loginFailed: Anmeldung fehlgeschlagen
+  changePassword: Passwort ändern
+  currentPassword: Aktuelles Passwort
+  newPassword: Neues Passwort
+  confirmPassword: Passwort bestätigen
+  passwordChanged: Passwort erfolgreich geändert
+  passwordMismatch: Passwörter stimmen nicht überein
+
+dashboard:
+  title: "Übersicht"
+  expiringSoon: "Läuft bald ab"
+  expired: Abgelaufen
+  lowStock: Niedriger Bestand
+  todaysMeals: Heutige Mahlzeiten
+  todaysNutrition: "Heutige Nährwerte"
+  shoppingPreview: Einkaufsliste
+  noExpiring: Nichts läuft bald ab
+  noLowStock: Alle Artikel ausreichend vorhanden
+  noMeals: Keine Mahlzeiten geplant
+  noMealPlanned: Nicht geplant
+  viewAll: Alle anzeigen
+  stats:
+    articles: Artikel
+    batches: Chargen
+    locations: Lagerorte
+    recipes: Rezepte
+
+inventory:
+  title: Inventar
+  addArticle: Artikel hinzufügen
+  searchPlaceholder: Artikel suchen...
+  totalItems: "{count} Artikel"
+  emptyLocation: Keine Artikel an diesem Ort
+  empty: Noch keine Artikel
+  allLocations: Alle Lagerorte
+  noLocation: Kein Lagerort
+  stock: Bestand
+  expiry: Haltbarkeit
+
+article:
+  name: Name
+  barcode: Barcode
+  location: Lagerort
+  packageSize: Packungsgröße
+  unit: Einheit
+  unitDefault: Einheit (Standard)
+  minStock: Mindestbestand
+  minStockHelp: Warnung wenn darunter
+  expiryDefault: Standard-Haltbarkeit (Tage)
+  expiryDefaultHelp: Automatische Berechnung beim Einkauf
+  category: Kategorie
+  categoryPlaceholder: "z.B. Milchprodukte, Nudeln, Reinigung"
+  isConsumable: Verbrauchsartikel
+  isConsumableHelp: Berechnet voraussichtlichen Bedarf aus Verbrauchshistorie
+  batches: Chargen
+  addBatch: Einkauf hinzufügen
+  consume: Verbrauchen
+  details: Artikeldetails
+  edit: Artikel bearbeiten
+  create: Neuer Artikel
+  delete: Artikel löschen
+  deleteConfirm: Möchten Sie diesen Artikel wirklich löschen?
+  noStock: Kein Bestand
+  nutrition: Nährwerte (pro 100g/ml)
+  calories: Kalorien
+  protein: Eiweiß
+  carbs: Kohlenhydrate
+  fat: Fett
+  fiber: Ballaststoffe
+  usedInRecipes: Verwendet in Rezepten
+
+batch:
+  quantity: Menge
+  purchaseDate: Kaufdatum
+  expiryDate: Haltbarkeitsdatum
+  price: Preis
+  notes: Notizen
+  expires: "Läuft ab am {date}"
+  expired: Abgelaufen
+  expiresIn: "Läuft ab in {days} Tagen"
+  expiresInOne: "Läuft ab in 1 Tag"
+  expiresToday: "Läuft heute ab"
+  addPurchase: Einkauf hinzufügen
+  edit: Charge bearbeiten
+  editPurchase: Einkauf bearbeiten
+  delete: Charge löschen
+  deleteConfirm: "Möchten Sie diese Charge wirklich löschen?"
+  consumeAmount: Menge zum Verbrauchen
+  remaining: "Verbleibend: {amount}"
+  noExpiryHint: Leer lassen für Artikel ohne Ablaufdatum
+  alreadyConsumed: "Achtung: Es wurden bereits {amount} verbraucht"
+  minQuantityHint: "Minimum: {amount} (bereits verbraucht)"
+
+location:
+  title: Lagerorte
+  add: Lagerort hinzufügen
+  edit: Lagerort bearbeiten
+  delete: Lagerort löschen
+  deleteConfirm: "Möchten Sie diesen Lagerort wirklich löschen?"
+  deleteHasArticles: Lagerort mit Artikeln kann nicht gelöscht werden
+  name: Name
+  icon: Symbol
+  empty: Noch keine Lagerorte
+
+product:
+  title: Produkte
+  add: Produkt hinzufügen
+  edit: Produkt bearbeiten
+  delete: Produkt löschen
+  deleteConfirm: "Möchten Sie dieses Produkt wirklich löschen?"
+  name: Produktname
+  namePlaceholder: "z.B. Barilla Spaghetti"
+  brand: Marke
+  brandPlaceholder: "z.B. Barilla"
+  barcode: Barcode
+  empty: Noch keine Produkte. Füge ein Produkt hinzu um bestimmte Varianten mit Barcodes zu verfolgen.
+
+recipe:
+  title: Rezepte
+  add: Rezept hinzufügen
+  edit: Rezept bearbeiten
+  delete: Rezept löschen
+  deleteConfirm: "Möchten Sie dieses Rezept wirklich löschen?"
+  name: Name
+  description: Beschreibung
+  servings: Portionen
+  prepTime: Zubereitungszeit
+  cookTime: Kochzeit
+  instructions: Anleitung
+  instructionsPlaceholder: "Schritt 1: ..."
+  ingredients: Zutaten
+  ingredientsEmpty: Noch keine Zutaten. Klicke oben auf den Button um eine hinzuzufügen.
+  addIngredient: Zutat hinzufügen
+  cook: Jetzt kochen
+  empty: Noch keine Rezepte
+
+mealPlan:
+  title: Essensplan
+  breakfast: "Frühstück"
+  lunch: Mittagessen
+  dinner: Abendessen
+  snack: Snack
+  addMeal: Mahlzeit hinzufügen
+  removeMeal: Mahlzeit entfernen
+  empty: Keine Mahlzeiten geplant
+  mealType: Mahlzeittyp
+  selectRecipe: Rezept
+  markCooked: Als gekocht markieren
+  markNotCooked: "Nicht gekocht (rückgängig)"
+  viewRecipe: Zum Rezept
+  cooked: Gekocht
+
+shopping:
+  title: Einkaufsliste
+  shopDate: Einkaufstag
+  planUntil: Planen bis
+  estimatedTotal: "Geschätzte Kosten: {amount}"
+  generateList: Liste erstellen
+  generateDescription: Dies analysiert deinen Essensplan und Bestand, um eine smarte Einkaufsliste zu erstellen.
+  completeShop: Einkauf abschließen
+  addItem: Artikel hinzufügen
+  empty: Einkaufsliste ist leer
+  itemReason:
+    recipe: "Für Rezept"
+    lowStock: Niedriger Bestand
+    forecast: Voraussichtlicher Bedarf
+    manual: Manuell hinzugefügt
+  purchased: Gekauft
+  remaining: Verbleibend
+
+settings:
+  title: Einstellungen
+  language: Sprache
+  languageHelp: "Wähle deine bevorzugte Sprache"
+  password: App-Passwort
+  defaultShopDay: Standard-Einkaufstag
+  currency: "Währung"
+  theme: Design
+  themeHelp: "Wähle dein bevorzugtes Design"
+  themeLight: Hell
+  themeDark: Dunkel
+  themeSystem: System
+  english: Englisch
+  german: Deutsch
+  sunday: Sonntag
+  monday: Montag
+  tuesday: Dienstag
+  wednesday: Mittwoch
+  thursday: Donnerstag
+  friday: Freitag
+  saturday: Samstag
+  locations: Lagerorte
+  locationsHelp: Verwalte deine Lagerorte
+  units: Einheiten
+  unitsHelp: Verwalte Maßeinheiten
+  addUnit: Einheit hinzufügen
+  editUnit: Einheit bearbeiten
+  unitName: Einheitenname
+  unitSymbol: Symbol
+  defaultUnits: Standard
+  deleteUnitConfirm: "Diese Einheit wird möglicherweise in Artikeln oder Rezepten verwendet. Trotzdem löschen?"
+  customUnits: Eigene Einheiten
+  conversionGroup: Umrechnungsgruppe
+  conversionGroupHelp: Einheiten der gleichen Gruppe können ineinander umgerechnet werden
+  noConversion: Keine Umrechnung
+  conversionFactor: Umrechnungsfaktor
+  conversionFactorHelp: Wie viele Basiseinheiten entsprechen dieser Einheit?
+  baseUnit: Basiseinheit
+  customConversion: Eigene Umrechnung
+  customConversionHelp: "Definiere eine Umrechnung zu einer anderen Einheit (z.B. 1 Rolle = 50 Blatt)"
+  selectUnit: Einheit wählen
+
+consumption:
+  history: Verbrauchshistorie
+  edit: Verbrauch bearbeiten
+  date: Datum & Uhrzeit
+  source:
+    manual: Manuell
+    recipe: Rezept
+    expired: Abgelaufen
+    waste: Verschwendung
+    correction: Korrektur
+
+activity:
+  history: Aktivitätsverlauf
+  purchase: Einkauf
+  consumption: Verbrauch
+  correction: Korrektur
+  added: hinzugefügt
+  consumed: verbraucht
+  corrected: korrigiert
+
+stock:
+  correction: Bestandskorrektur
+  correctTitle: Bestand korrigieren
+  actualStock: Tatsächlicher Bestand
+  currentStock: Aktueller Bestand
+  difference: Differenz
+  notes: Notizen (optional)
+  notesPlaceholder: "z.B. Inventur, Schwund"
+
+price:
+  title: Preisinformationen
+  lastPrice: Letzter Stückpreis
+  avgPrice: Ø Stückpreis
+  priceHistory: Preisverlauf
+  noPrice: Kein Preis erfasst
+  perUnit: "pro {unit}"
+
+expiry:
+  expired: Abgelaufen
+  today: Heute
+  tomorrow: Morgen
+  days: "{days} Tage"
+  unknown: Kein Ablaufdatum
