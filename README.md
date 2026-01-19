@@ -70,7 +70,22 @@ docker compose pull
 docker compose up -d
 ```
 
-### Development Setup
+### Local Docker Build
+
+If you want to build and test the Docker image locally:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+This builds the image from source and starts the container. Open http://localhost:8124 in your browser.
+
+To rebuild after changes:
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+### Development Setup (without Docker)
 
 1. Clone the repository:
    ```bash
